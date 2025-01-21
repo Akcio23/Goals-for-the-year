@@ -2,9 +2,13 @@ import request from 'supertest';
 import express from 'express';
 import mongoose from 'mongoose';
 import goalRoutes from '../routes/goalRoutes.js'; // ajuste o caminho, se necessário
-import Goal from '../models/Goals.js'; // Modelo de banco de dados
+import Goal from '../models/Goals.js';
+import dotenv from "dotenv"
+
 
 // Configurar o app com as rotas
+dotenv.config();
+
 const app = express();
 app.use(express.json());
 app.use(goalRoutes);
@@ -13,8 +17,10 @@ app.use(goalRoutes);
 beforeAll(async () => {
 
     // Conectar ao banco de dados MongoDB em memória para testes
-    const url = `mongodb+srv://pedroacaciioosk8:n84Tzeghmd1wGLVC@cluster0.dzi1v.mongodb.net/`;
-    await mongoose.connect(url);
+
+    const URL= process.env.DATABASE_URL || "url.db"
+    console.log(URL)
+    await mongoose.connect(URL);
 
 });
 
