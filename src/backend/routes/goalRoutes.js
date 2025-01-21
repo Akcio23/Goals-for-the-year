@@ -50,16 +50,16 @@ goalRoutes.delete('/goal/:id', async (req, res) => {
 
         if (!goal) {
 
-            res.status(404).send("ID not found");
+            return res.status(404).send("ID not found");
         }
 
         await Goal.findByIdAndDelete(goal)  
 
         return res.status(200).send("deletado com sucesso")
 
-    } catch (error) {
+    } catch (err) {
 
-        return res.status(400).send(error.message)
+        return res.status(400).send(err.message)
     }
 
 

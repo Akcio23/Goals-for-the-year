@@ -11,8 +11,11 @@ app.use(goalRoutes);
 
 // Configurações para testes usando o MongoDB em memória
 beforeAll(async () => {
-    const url = `mongodb://127.0.0.1/goalTestDB`;
-    await mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+
+    // Conectar ao banco de dados MongoDB em memória para testes
+    const url = `mongodb+srv://pedroacaciioosk8:n84Tzeghmd1wGLVC@cluster0.dzi1v.mongodb.net/`;
+    await mongoose.connect(url);
+
 });
 
 afterAll(async () => {
