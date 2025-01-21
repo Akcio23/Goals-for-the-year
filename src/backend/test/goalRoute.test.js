@@ -5,6 +5,7 @@ import goalRoutes from '../routes/goalRoutes.js'; // ajuste o caminho, se necess
 import Goal from '../models/Goals.js';
 import dotenv from "dotenv"
 
+
 // Configurar o app com as rotas
 dotenv.config();
 
@@ -12,16 +13,18 @@ const app = express();
 app.use(express.json());
 app.use(goalRoutes);
 
+// Configurações para testes usando o MongoDB em memória
 beforeAll(async () => {
+
     // Conectar ao banco de dados MongoDB em memória para testes
 
     const URL= process.env.DATABASE_URL || "url.db"
     console.log(URL)
     await mongoose.connect(URL);
+
 });
 
 afterAll(async () => {
-    // Desconectar e limpar o banco de dados após os testes
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
 });
@@ -46,7 +49,6 @@ describe('Goal Routes', () => {
     });
 
     it('Deve deletar uma meta existente (DELETE /goal/:id)', async () => {
-        // Primeiro, criar uma meta
         const goal = await Goal.create({ metaOne: 'Test Meta', metaTwo: 'Test Meta 2' });
 
         const res = await request(app).delete(`/goal/${goal._id}`);
@@ -60,5 +62,31 @@ describe('Goal Routes', () => {
 
         expect(res.statusCode).toBe(404);
         expect(res.text).toBe('ID not found');
+    });
+});
+
+jest.mock('../models/Goals');
+
+describe('GET /goal', () => {
+    it('deve retornar uma lista de objetivos com status 200', async () => {
+        Goal.find.mockResolvedValue([
+            { metaOne: 'Aprender Jest', metaTwo: 'Estudar Node.js' }
+        ]);
+
+        const res = await request(app).get('/goal');
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual([
+            { metaOne: 'Aprender Jest', metaTwo: 'Estudar Node.js' }
+        ]);
+    });
+
+    it('deve retornar um erro com status 400 quando ocorrer uma falha', async () => {
+        Goal.find.mockRejectedValue(new Error('Falha ao buscar objetivos'));
+
+        const res = await request(app).get('/goal');
+
+        expect(res.status).toBe(400);
+        expect(res.text).toBe('Falha ao buscar objetivos');
     });
 });
