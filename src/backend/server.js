@@ -2,11 +2,10 @@ import dotenv from "dotenv"
 import app from "./app.js"
 import mongoose from "mongoose";
 
-dotenv.config();
+dotenv.config({path:"/home/pedro_acacio/projetos/Goals-for-the-year/.env"});
 
 const PORT = 3000
 const dbUrl = process.env.DATABASE_URL
-
 
 mongoose.connect(dbUrl)
 
