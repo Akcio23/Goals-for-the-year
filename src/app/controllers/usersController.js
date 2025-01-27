@@ -1,35 +1,48 @@
 import UsersModel from '../models/usersModel'
+import {createResponse} from '../utils/createResponse'
 import connectDb from '../lib/mongodb'
 
-export const createUser = async(req, res) =>{
-    const {name, lastName} = req.body
+export const createUser = async(req) =>{
+
+    connectDb()
+
+    const { name, lastName } = await req.json();
+
     if (!name || !lastName) {
-        return res.status(400).json({ message: 'Nome e email são obrigatórios!' });
-    }
+
+        return createResponse({ message:"Name and LastName are required"},400);
+    };
+
     try{
-        await connectDb()
 
         const newUser = new UsersModel({name, lastName})
-
-        await newUser.save()
-
-        return res.status(201).send("User Saved")
-        
-    }catch(error){
-
-        res.status(500).json({ message: 'Erro ao criar usuário', error });
-    }
     
+        await newUser.save()
+    
+        return createResponse({message: "User added successfully."},201);
+    
+    }catch(error){
+    
+        console.error("Error in POST:", error);
+
+        return createResponse({message: "Internal Server Error"},500);
+    };
 }
 
-export const getUsers = async(req, res) =>{
+export const getUsers = async() =>{
+    
+    connectDb()
+    
     try{
+        
         const user = await UsersModel.find()
 
-        return res.status(200).send(user)
-        
+        return createResponse(user,200)
+
     }catch(error){
-        res.status(500).json({ message: 'Erro ao buscar usuários', error });
-    }
-    
+
+        console.error("Error in GET:", error);
+
+        return createResponse({message: "Internal Server Error"},500)
+    };
 }
